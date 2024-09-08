@@ -67,6 +67,31 @@ document.addEventListener('DOMContentLoaded', function() {
         return storedParams ? JSON.parse(storedParams) : {};
     }
 
+    function updateUTMInLinks() {
+        var utmParams = getUTMFromLocalStorage();
+
+        if (Object.keys(utmParams).length > 0) {
+            // Aggiorna il link del bottone
+            var button = document.querySelector('a.elButton');
+            if (button) {
+                var buttonHref = button.getAttribute('href');
+                var buttonDataOnSubmitGoTo = button.getAttribute('data-on-submit-go-to');
+
+                if (buttonHref) {
+                    var newButtonHref = new URL(buttonHref, window.location.origin);
+                    Object.keys(utmParams).forEach(key => newButtonHref.searchParams.set(key, utmParams[key]));
+                    button.setAttribute('href', newButtonHref.toString());
+                }
+
+                if (buttonDataOnSubmitGoTo) {
+                    var newDataOnSubmitGoTo = new URL(buttonDataOnSubmitGoTo, window.location.origin);
+                    Object.keys(utmParams).forEach(key => newDataOnSubmitGoTo.searchParams.set(key, utmParams[key]));
+                    button.setAttribute('data-on-submit-go-to', newDataOnSubmitGoTo.toString());
+                }
+            }
+        }
+    }
+
     function handleFormSubmission(event) {
         event.preventDefault();
         var validationMessage = validateInputs();
@@ -80,28 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMessage.style.display = 'none';
         console.log('Form valido, procedi con l\'invio');
         
-        var form = event.target.closest('form');
-        if (form) {
-            var utmParams = getUTMFromLocalStorage();
-            console.log('UTM Parameters:', utmParams);
-            
-            // Aggiungi i parametri UTM come campi nascosti al form
-            Object.keys(utmParams).forEach(key => {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = utmParams[key];
-                form.appendChild(input);
-                console.log('Added UTM param to form:', key, utmParams[key]);
-            });
-
-            // Invia il form
-            form.submit();
+        var button = event.target.closest('a.elButton');
+        if (button) {
+            updateUTMInLinks();
+            window.location.href = button.getAttribute('href');
         }
     }
 
     function attachFormListener() {
-        var submitButton = document.querySelector('#modalPopup .elBTN .elButton');
+        var submitButton = document.querySelector('a.elButton');
         if (submitButton) {
             submitButton.addEventListener('click', handleFormSubmission);
             console.log('Form listener attached');
