@@ -85,47 +85,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function handleFormSubmission(event) {
-        event.preventDefault();
-        var validationMessage = validateInputs();
-        if (validationMessage) {
-            console.log("Validazione fallita: " + validationMessage);
-            errorMessage.textContent = validationMessage;
-            errorMessage.style.display = 'block';
-            return;
-        }
-
-        errorMessage.style.display = 'none';
-        console.log('Form valido, procedi con l\'invio');
-        
-        var form = event.target.closest('form');
-        if (form) {
-            var utmParams = getUTMParameters();
-            console.log('UTM Parameters:', utmParams);
-
-            // Aggiungi i parametri UTM come campi nascosti al form
-            Object.keys(utmParams).forEach(key => {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = utmParams[key];
-                form.appendChild(input);
-                console.log('Added UTM param to form:', key, utmParams[key]);
-            });
-
-            // Invia il form
-            form.submit();
+    function handleButtonClick(event) {
+        var utmParams = getUTMParameters();
+        var button = event.target.closest('a');
+        if (button) {
+            var redirectTo = button.getAttribute('data-on-submit-go-to');
+            if (redirectTo) {
+                event.preventDefault();
+                var updatedUrl = updateUrlWithUTM(redirectTo, utmParams);
+                window.location.href = updatedUrl;
+            }
         }
     }
 
-    function attachFormListener() {
-        var submitButton = document.querySelector('#modalPopup .elBTN .elButton');
-        if (submitButton) {
-            submitButton.addEventListener('click', handleFormSubmission);
-            console.log('Form listener attached');
-        } else {
-            setTimeout(attachFormListener, 100);
-        }
+    function attachButtonListener() {
+        var buttons = document.querySelectorAll('.elButton');
+        buttons.forEach(function(button) {
+            button.addEventListener('click', handleButtonClick);
+        });
+        console.log('Button listener attached');
     }
 
     function updateLinks(utmParams) {
@@ -143,31 +121,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var utmParams = getUTMParameters();
     console.log("Parametri UTM:", utmParams);
 
-    // Salva i parametri UTM nel localStorage
-    storeUTMInLocalStorage(utmParams);
-
-    // Osserva l'apertura del popup
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                var popup = document.getElementById('modalPopup');
-                if (popup && window.getComputedStyle(popup).display !== 'none') {
-                    attachFormListener();
-                    observer.disconnect();
-                }
-            }
-        });
-    });
-
-    var popup = document.getElementById('modalPopup');
-    if (popup) {
-        observer.observe(popup, { attributes: true });
-    }
-
-    // Visualizza messaggio di input iniziale
-    errorMessage.textContent = 'Assicurati di inserire email e/o telefono corretti.';
-    errorMessage.style.display = 'block';
-
     // Aggiorna i link con i parametri UTM
     updateLinks(utmParams);
+
+    // Attacca l'ascoltatore di click ai bottoni
+    attachButtonListener();
 });
