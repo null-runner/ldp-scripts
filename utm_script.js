@@ -71,18 +71,19 @@ document.addEventListener('DOMContentLoaded', function() {
         var utmParams = getUTMFromLocalStorage();
 
         if (Object.keys(utmParams).length > 0) {
-            // Aggiorna il link del bottone
             var button = document.querySelector('a.elButton');
             if (button) {
                 var buttonHref = button.getAttribute('href');
                 var buttonDataOnSubmitGoTo = button.getAttribute('data-on-submit-go-to');
 
-                if (buttonHref) {
+                // Aggiorna href
+                if (buttonHref && !buttonHref.startsWith('#')) {
                     var newButtonHref = new URL(buttonHref, window.location.origin);
                     Object.keys(utmParams).forEach(key => newButtonHref.searchParams.set(key, utmParams[key]));
                     button.setAttribute('href', newButtonHref.toString());
                 }
 
+                // Aggiorna data-on-submit-go-to
                 if (buttonDataOnSubmitGoTo) {
                     var newDataOnSubmitGoTo = new URL(buttonDataOnSubmitGoTo, window.location.origin);
                     Object.keys(utmParams).forEach(key => newDataOnSubmitGoTo.searchParams.set(key, utmParams[key]));
@@ -105,10 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMessage.style.display = 'none';
         console.log('Form valido, procedi con l\'invio');
         
-        var button = event.target.closest('a.elButton');
+        var button = document.querySelector('a.elButton');
         if (button) {
             updateUTMInLinks();
-            window.location.href = button.getAttribute('href');
+            var redirectUrl = button.getAttribute('data-on-submit-go-to');
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                console.log("URL di reindirizzamento non trovato.");
+            }
         }
     }
 
