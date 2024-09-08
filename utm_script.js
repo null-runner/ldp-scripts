@@ -19,23 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Messaggio di errore posizionato correttamente");
     }
 
-    var iti;
-    if (phoneInput) {
-        iti = window.intlTelInput(phoneInput, {
-            initialCountry: 'it',
-            autoPlaceholder: 'polite',
-            utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.16/js/utils.js'
-        });
-
-        phoneInput.value = '+39 ';
-        setTimeout(function() {
-            phoneInput.value = '';
-        }, 100);
-    }
-
     function validateInputs() {
-        var phoneValid = phoneInput ? iti.isValidNumber() : true;
-        var emailValid = validateEmail(emailInput.value);
+        var phoneValid = phoneInput ? validatePhone(phoneInput.value) : true;
+        var emailValid = emailInput ? validateEmail(emailInput.value) : true;
 
         console.log("Phone valid:", phoneValid);
         console.log("Email valid:", emailValid);
@@ -56,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return re.test(String(email).toLowerCase());
     }
 
+    function validatePhone(phone) {
+        // Semplice validazione per numeri italiani
+        var re = /^(\+39|0039)?\s?3\d{2}[\s.-]?\d{6,7}$/;
+        return re.test(String(phone).replace(/\s+/g, ''));
+    }
+
     function getUTMParameters() {
         var params = {};
         window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
@@ -63,25 +55,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 params[key] = decodeURIComponent(value);
             }
         });
-        console.log("Parametri UTM ottenuti:", params);
         return params;
     }
 
-    function updateUrlWithUTM(url, utmParams) {
-        try {
-            var newUrl = new URL(url, window.location.origin);
-            var existingParams = new URLSearchParams(newUrl.search);
+    function storeUTMInLocalStorage(utmParams) {
+        localStorage.setItem('utmParams', JSON.stringify(utmParams));
+    }
 
-            for (var key in utmParams) {
-                existingParams.set(key, utmParams[key]);
+    function getUTMFromLocalStorage() {
+        var storedParams = localStorage.getItem('utmParams');
+        return storedParams ? JSON.parse(storedParams) : {};
+    }
+
+    function updateUTMInLinks() {
+        var utmParams = getUTMFromLocalStorage();
+
+        if (Object.keys(utmParams).length > 0) {
+            var button = document.querySelector('a.elButton');
+            if (button) {
+                var buttonHref = button.getAttribute('href');
+                var buttonDataOnSubmitGoTo = button.getAttribute('data-on-submit-go-to');
+
+                // Aggiorna href
+                if (buttonHref && !buttonHref.startsWith('#')) {
+                    var newButtonHref = new URL(buttonHref, window.location.origin);
+                    Object.keys(utmParams).forEach(key => newButtonHref.searchParams.set(key, utmParams[key]));
+                    button.setAttribute('href', newButtonHref.toString());
+                }
+
+                // Aggiorna data-on-submit-go-to
+                if (buttonDataOnSubmitGoTo) {
+                    var newDataOnSubmitGoTo = new URL(buttonDataOnSubmitGoTo, window.location.origin);
+                    Object.keys(utmParams).forEach(key => newDataOnSubmitGoTo.searchParams.set(key, utmParams[key]));
+                    button.setAttribute('data-on-submit-go-to', newDataOnSubmitGoTo.toString());
+                }
             }
-
-            newUrl.search = existingParams.toString();
-            console.log("URL aggiornato con parametri UTM:", newUrl.toString());
-            return newUrl.toString();
-        } catch (e) {
-            console.error("Errore in updateUrlWithUTM:", e.message);
-            return url;
         }
     }
 
@@ -98,28 +106,20 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMessage.style.display = 'none';
         console.log('Form valido, procedi con l\'invio');
         
-        var form = event.target.closest('form');
-        if (form) {
-            var utmParams = getUTMParameters();
-            console.log('UTM Parameters:', utmParams);
-
-            // Aggiungi i parametri UTM come campi nascosti al form
-            Object.keys(utmParams).forEach(key => {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = utmParams[key];
-                form.appendChild(input);
-                console.log('Added UTM param to form:', key, utmParams[key]);
-            });
-
-            // Invia il form
-            form.submit();
+        var button = document.querySelector('a.elButton');
+        if (button) {
+            updateUTMInLinks();
+            var redirectUrl = button.getAttribute('data-on-submit-go-to');
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                console.log("URL di reindirizzamento non trovato.");
+            }
         }
     }
 
     function attachFormListener() {
-        var submitButton = document.querySelector('#modalPopup .elBTN .elButton');
+        var submitButton = document.querySelector('a.elButton');
         if (submitButton) {
             submitButton.addEventListener('click', handleFormSubmission);
             console.log('Form listener attached');
@@ -128,23 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateLinks(utmParams) {
-        var links = document.querySelectorAll('a');
-        links.forEach(function(link) {
-            var currentHref = link.getAttribute('href');
-            if (currentHref && !currentHref.startsWith('#') && !currentHref.startsWith('mailto:')) {
-                var updatedUrl = updateUrlWithUTM(currentHref, utmParams);
-                link.setAttribute('href', updatedUrl);
-                console.log("Link aggiornato:", link.getAttribute('href'));
-            }
-        });
-    }
-
-    var utmParams = getUTMParameters();
-    console.log("Parametri UTM:", utmParams);
-
     // Salva i parametri UTM nel localStorage
+    var utmParams = getUTMParameters();
     storeUTMInLocalStorage(utmParams);
+    console.log('UTM params stored in localStorage:', utmParams);
 
     // Osserva l'apertura del popup
     var observer = new MutationObserver(function(mutations) {
@@ -167,7 +154,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Visualizza messaggio di input iniziale
     errorMessage.textContent = 'Assicurati di inserire email e/o telefono corretti.';
     errorMessage.style.display = 'block';
-
-    // Aggiorna i link con i parametri UTM
-    updateLinks(utmParams);
 });
