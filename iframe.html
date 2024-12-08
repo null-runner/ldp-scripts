@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IFrame Receiver</title>
+    <script>
+        window.addEventListener("message", (event) => {
+            // Verifica l'origine per sicurezza
+            if (event.origin === "https://tuo-dominio-principale.com") { // Sostituisci con il dominio effettivo
+                const utmUrl = event.data;
+                console.log("URL ricevuto:", utmUrl);
+
+                // Opzionale: Reindirizza l'utente all'URL ricevuto
+                window.location.href = utmUrl;
+            } else {
+                console.error("Origine non valida:", event.origin);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Attendi il reindirizzamento...</h1>
+</body>
+</html>
