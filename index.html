@@ -10,14 +10,19 @@
         
         if (encodedUrl) {
             const decodedUrl = atob(encodedUrl);
-            
-            // Inserisci l'URL decodificato in un iframe
+
+            // Inserisci l'iframe nella pagina
             const iframe = document.createElement('iframe');
-            iframe.src = decodedUrl;
+            iframe.src = "https://tuo-dominio-destino.com/iframe.html"; // Cambia con il link del tuo iframe
             iframe.style.width = '100%';
             iframe.style.height = '100vh';
             iframe.style.border = 'none';
             document.body.appendChild(iframe);
+
+            // Invio dei parametri all'iframe
+            iframe.onload = () => {
+                iframe.contentWindow.postMessage(decodedUrl, "https://tuo-dominio-destino.com");
+            };
         } else {
             document.body.innerHTML = '<h1>URL mancante!</h1>';
         }
