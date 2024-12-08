@@ -2,10 +2,48 @@
 <html>
 <head>
     <title>IFrame Receiver</title>
+    <style>
+        /* Reset margini e padding */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        iframe {
+            /* Dimensioni base */
+            width: 100%;
+            height: 100%;
+
+            /* Stile senza bordi */
+            border: none;
+        }
+
+        /* Media queries per ottimizzare il contenuto */
+        @media (max-width: 768px) { /* Schermi piccoli (mobile) */
+            iframe {
+                /* Assicurati che l'iframe sia leggibile */
+                width: 100vw;
+                height: calc(100vh - 20px); /* Lascia uno spazio per margini o header */
+            }
+        }
+
+        @media (min-width: 769px) { /* Schermi più grandi (desktop) */
+            iframe {
+                /* Spaziatura leggera per desktop */
+                width: 90%;
+                height: 90%;
+            }
+        }
+    </style>
     <script>
         window.addEventListener("message", (event) => {
-            // Verifica l'origine del messaggio
-            if (event.origin === "https://gh.lucadelprete.com") {
+            // Verifica l'origine per sicurezza
+            if (event.origin === "https://gh.lucadelprete.com") { // Aggiorna con il tuo dominio
                 const utmUrl = event.data;
                 console.log("URL ricevuto:", utmUrl);
 
@@ -18,6 +56,6 @@
     </script>
 </head>
 <body>
-    <h1>Attendi il reindirizzamento...</h1>
+    <iframe id="contentFrame"></iframe>
 </body>
 </html>
