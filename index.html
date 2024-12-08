@@ -7,23 +7,27 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const encodedUrl = urlParams.get('url');
-        
+
+        console.log("Parametro URL Base64:", encodedUrl);
+
         if (encodedUrl) {
-            const decodedUrl = atob(encodedUrl);
+            try {
+                const decodedUrl = atob(encodedUrl);
+                console.log("URL Decodificato:", decodedUrl);
 
-            // Inserisci l'iframe nella pagina
-            const iframe = document.createElement('iframe');
-            iframe.src = "https://gh.lucadelprete.com/iframe.html"; // Cambia con il link del tuo iframe
-            iframe.style.width = '100%';
-            iframe.style.height = '100vh';
-            iframe.style.border = 'none';
-            document.body.appendChild(iframe);
-
-            // Invio dei parametri all'iframe
-            iframe.onload = () => {
-                iframe.contentWindow.postMessage(decodedUrl, "https://gh.lucadelprete.com");
-            };
+                // Inserisci l'iframe
+                const iframe = document.createElement('iframe');
+                iframe.src = decodedUrl;
+                iframe.style.width = '100%';
+                iframe.style.height = '100vh';
+                iframe.style.border = 'none';
+                document.body.appendChild(iframe);
+            } catch (e) {
+                console.error("Errore durante la decodifica Base64:", e);
+                document.body.innerHTML = '<h1>Errore nella decodifica dell\'URL</h1>';
+            }
         } else {
+            console.error("Parametro 'url' mancante");
             document.body.innerHTML = '<h1>URL mancante!</h1>';
         }
     </script>
