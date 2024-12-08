@@ -18,32 +18,28 @@
             /* Dimensioni base */
             width: 100%;
             height: 100%;
-
-            /* Stile senza bordi */
             border: none;
         }
 
         /* Media queries per ottimizzare il contenuto */
         @media (max-width: 768px) { /* Schermi piccoli (mobile) */
             iframe {
-                /* Assicurati che l'iframe sia leggibile */
                 width: 100vw;
-                height: calc(100vh - 20px); /* Lascia uno spazio per margini o header */
+                height: 100vh; /* Occupa tutto lo schermo */
             }
         }
 
         @media (min-width: 769px) { /* Schermi più grandi (desktop) */
             iframe {
-                /* Spaziatura leggera per desktop */
                 width: 90%;
-                height: 90%;
+                height: 90%; /* Margine leggero per desktop */
             }
         }
     </style>
     <script>
         window.addEventListener("message", (event) => {
             // Verifica l'origine per sicurezza
-            if (event.origin === "https://gh.lucadelprete.com") { // Aggiorna con il tuo dominio
+            if (event.origin === "https://gh.lucadelprete.com") {
                 const utmUrl = event.data;
                 console.log("URL ricevuto:", utmUrl);
 
