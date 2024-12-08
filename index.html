@@ -4,6 +4,7 @@
     <title>Candidatura - Luca Del Prete</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Stile base per il body */
         body {
             margin: 0;
             padding: 0;
@@ -14,15 +15,28 @@
             background-color: #f9f9f9; /* Sfondo neutro */
         }
 
+        /* Stile per l'iframe */
         iframe {
             width: 100%;
             height: 100vh;
             border: none;
+
+            /* Aggiunta per supportare contenuti responsivi */
+            transform-origin: top left;
+            transform: scale(1); /* Scala predefinita */
         }
 
+        /* Media query per schermi piccoli (mobile) */
         @media (max-width: 768px) {
             iframe {
-                height: 100vh; /* Mantiene il contenuto responsivo */
+                transform: scale(1); /* Mostra contenuti a dimensione naturale */
+            }
+        }
+
+        /* Media query per schermi più grandi (desktop) */
+        @media (min-width: 769px) {
+            iframe {
+                transform: scale(1); /* Mantieni scala normale */
             }
         }
     </style>
