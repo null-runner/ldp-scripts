@@ -13,7 +13,7 @@
 
             // Inserisci l'iframe nella pagina
             const iframe = document.createElement('iframe');
-            iframe.src = "https://tuo-dominio-destino.com/iframe.html"; // Cambia con il link del tuo iframe
+            iframe.src = "https://gh.lucadelprete.com/iframe.html"; // Cambia con il link del tuo iframe
             iframe.style.width = '100%';
             iframe.style.height = '100vh';
             iframe.style.border = 'none';
@@ -21,7 +21,7 @@
 
             // Invio dei parametri all'iframe
             iframe.onload = () => {
-                iframe.contentWindow.postMessage(decodedUrl, "https://tuo-dominio-destino.com");
+                iframe.contentWindow.postMessage(decodedUrl, "https://gh.lucadelprete.com");
             };
         } else {
             document.body.innerHTML = '<h1>URL mancante!</h1>';
