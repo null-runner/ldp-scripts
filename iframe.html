@@ -4,12 +4,12 @@
     <title>IFrame Receiver</title>
     <script>
         window.addEventListener("message", (event) => {
-            // Verifica l'origine per sicurezza
-            if (event.origin === "https://tuo-dominio-principale.com") { // Sostituisci con il dominio effettivo
+            // Verifica l'origine del messaggio
+            if (event.origin === "https://gh.lucadelprete.com") {
                 const utmUrl = event.data;
                 console.log("URL ricevuto:", utmUrl);
 
-                // Opzionale: Reindirizza l'utente all'URL ricevuto
+                // Reindirizza all'URL con UTM
                 window.location.href = utmUrl;
             } else {
                 console.error("Origine non valida:", event.origin);
