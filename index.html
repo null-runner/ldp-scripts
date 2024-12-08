@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirect</title>
+    <title>Redirect via IFrame</title>
 </head>
-<body>
+<body style="margin: 0; padding: 0;">
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const encodedUrl = urlParams.get('url');
         
         if (encodedUrl) {
             const decodedUrl = atob(encodedUrl);
-            window.location.href = decodedUrl;
+            
+            // Inserisci l'URL decodificato in un iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = decodedUrl;
+            iframe.style.width = '100%';
+            iframe.style.height = '100vh';
+            iframe.style.border = 'none';
+            document.body.appendChild(iframe);
+        } else {
+            document.body.innerHTML = '<h1>URL mancante!</h1>';
         }
     </script>
 </body>
