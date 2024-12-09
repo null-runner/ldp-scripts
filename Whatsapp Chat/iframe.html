@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe - WhatsApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <script>
+        window.addEventListener("message", (event) => {
+            // Verifica l'origine per sicurezza
+            if (event.origin === "https://tuo-dominio.github.io") {
+                const utmUrl = new URL(event.data);
+
+                // Aggiungi UTM specifici per WhatsApp
+                utmUrl.searchParams.set('utm_source', 'whatsapp');
+                utmUrl.searchParams.set('utm_content', 'chat');
+                console.log("URL con UTM ricevuto:", utmUrl.toString());
+
+                // Reindirizza l'iframe all'URL aggiornato
+                window.location.href = utmUrl.toString();
+            } else {
+                console.error("Origine non valida:", event.origin);
+            }
+        });
+    </script>
+    <h1>Caricamento...</h1>
+</body>
+</html>
