@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Candidatura - WhatsApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Stile base per il body */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9; /* Sfondo neutro */
+        }
 
+        /* Stile per l'iframe */
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+
+            /* Aggiunta per supportare contenuti responsivi */
+            transform-origin: top left;
+            transform: scale(1); /* Scala predefinita */
+        }
+
+        /* Media query per schermi piccoli (mobile) */
+        @media (max-width: 768px) {
+            iframe {
+                transform: scale(1); /* Mostra contenuti a dimensione naturale */
+            }
+        }
+
+        /* Media query per schermi più grandi (desktop) */
+        @media (min-width: 769px) {
+            iframe {
+                transform: scale(1); /* Mantieni scala normale */
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Ottieni il parametro URL codificato in Base64
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedUrl = urlParams.get('url');
+
+        console.log("Parametro URL Base64:", encodedUrl);
+
+        if (encodedUrl) {
+            try {
+                // Decodifica l'URL
+                const decodedUrl = atob(encodedUrl);
+                console.log("URL Decodificato:", decodedUrl);
+
+                // Controlla se l'URL decodificato è valido
+                if (!/^https?:\/\//.test(decodedUrl)) {
+                    throw new Error("URL non valido.");
+                }
+
+                // Aggiungi i parametri UTM specifici per WhatsApp
+                const whatsappUrl = new URL(decodedUrl);
+                whatsappUrl.searchParams.set('utm_source', 'whatsapp');
+                whatsappUrl.searchParams.set('utm_content', 'chat');
+                console.log("URL con UTM:", whatsappUrl.toString());
+
+                // Crea l'iframe e inseriscilo nella pagina
+                const iframe = document.createElement('iframe');
+                iframe.src = whatsappUrl.toString();
+                iframe.style.width = '100%';
+                iframe.style.height = '100vh';
+                iframe.style.border = 'none';
+
+                // Aggiungi attributi di sicurezza all'iframe
+                iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+                iframe.setAttribute('loading', 'lazy'); // Ottimizza il caricamento su mobile
+
+                document.body.appendChild(iframe);
+            } catch (e) {
+                console.error("Errore durante la decodifica o il caricamento dell'URL:", e);
+                document.body.innerHTML = `
+                    <div style="text-align: center;">
+                        <h1>Errore nella decodifica dell'URL</h1>
+                        <p>Controlla che il link fornito sia valido.</p>
+                    </div>
+                `;
+            }
+        } else {
+            console.error("Parametro 'url' mancante");
+            document.body.innerHTML = `
+                <div style="text-align: center;">
+                    <h1>URL mancante!</h1>
+                    <p>Assicurati di includere un parametro valido nel link.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
